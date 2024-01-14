@@ -14,15 +14,21 @@ class LanguageBatchBo
 	 */
 	protected static $applications = array();
 
+	public function __construct(Config $config, ApiCall $apiCall)
+	{
+		$this->config = $config;
+		$this->apiCall = $apiCall;
+	}
+
 	/**
 	 * Starts the language file generation.
 	 *
 	 * @return void
 	 */
-	public static function generateLanguageFiles()
+	public function generateLanguageFiles()
 	{
 		// The applications where we need to translate.
-		self::$applications = Config::get('system.translated_applications');
+		self::$applications = $this->config->get('system.translated_applications');
 
 		echo "\nGenerating language files\n";
 		foreach (self::$applications as $application => $languages) {
@@ -49,10 +55,10 @@ class LanguageBatchBo
 	 *
 	 * @return bool   The success of the operation.
 	 */
-	protected static function getLanguageFile($application, $language)
+	protected function getLanguageFile($application, $language)
 	{
 		$result = false;
-		$languageResponse = ApiCall::call(
+		$languageResponse = $this->apiCall->call(
 			'system_api',
 			'language_api',
 			array(
@@ -89,9 +95,9 @@ class LanguageBatchBo
 	 *
 	 * @return string   The directory of the cached language files.
 	 */
-	protected static function getLanguageCachePath($application)
+	protected function getLanguageCachePath($application)
 	{
-		return Config::get('system.paths.root') . '/cache/' . $application. '/';
+		return $this->config->get('system.paths.root') . '/cache/' . $application. '/';
 	}
 
 	/**
@@ -101,7 +107,7 @@ class LanguageBatchBo
 	 *
 	 * @return void
 	 */
-	public static function generateAppletLanguageXmlFiles()
+	public function generateAppletLanguageXmlFiles()
 	{
 		// List of the applets [directory => applet_id].
 		$applets = array(
@@ -119,7 +125,7 @@ class LanguageBatchBo
 			else {
 				echo ' - Available languages: ' . implode(', ', $languages) . "\n";
 			}
-			$path = Config::get('system.paths.root') . '/cache/flash';
+			$path = $this->config->get('system.paths.root') . '/cache/flash';
 			foreach ($languages as $language) {
 				$xmlContent = self::getAppletLanguageFile($appletLanguageId, $language);
 				$xmlFile    = $path . '/lang_' . $language . '.xml';
@@ -144,9 +150,9 @@ class LanguageBatchBo
 	 *
 	 * @return array   The list of the available applet languages.
 	 */
-	protected static function getAppletLanguages($applet)
+	protected function getAppletLanguages($applet)
 	{
-		$result = ApiCall::call(
+		$result = $this->apiCall->call(
 			'system_api',
 			'language_api',
 			array(
@@ -175,9 +181,9 @@ class LanguageBatchBo
 	 *
 	 * @return string|false   The content of the language file or false if weren't able to get it.
 	 */
-	protected static function getAppletLanguageFile($applet, $language)
+	protected function getAppletLanguageFile($applet, $language)
 	{
-		$result = ApiCall::call(
+		$result = $this->apiCall->call(
 			'system_api',
 			'language_api',
 			array(
@@ -210,7 +216,7 @@ class LanguageBatchBo
 	 *
 	 * @return void
 	 */
-	protected static function checkForApiErrorResult($result)
+	protected function checkForApiErrorResult($result)
 	{
 		// Error during the api call.
 		if ($result === false || !isset($result['status'])) {
