@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+		<data>
+			<button_send value="Küldés"/>
+			<button_ok value="OK"/>
+			<button_close value="Bezárás"/>
+			<button_back value="Vissza"/>
+			<cancel value="Törlés"/>
+		</data>
