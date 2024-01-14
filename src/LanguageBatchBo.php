@@ -68,6 +68,7 @@ class LanguageBatchBo
 		$this->checkForApiErrorResult($langResponse);
 
 		$destination = $this->getLanguageCachePath($application) . $lang . '.php';
+
 		$this->createDirectoryIfNeeded($destination);
 
 		$result = file_put_contents($destination, $langResponse['data']);
@@ -109,8 +110,10 @@ class LanguageBatchBo
 
 		// If we got correct data we store it.
 		$destination = $this->getLanguageCachePath($application) . $lang . '.php';
+
 		// If there is no folder yet, we'll create it.
 		var_dump($destination);
+
 		if (!is_dir(dirname($destination))) {
 			mkdir(dirname($destination), 0755, true);
 		}
@@ -151,28 +154,36 @@ class LanguageBatchBo
 		foreach ($applets as $appletDirectory => $appletLanguageId) {
 			echo " Getting > $appletLanguageId ($appletDirectory) language xmls..\n";
 			$langs = $this->getAppletLanguages($appletLanguageId);
+
 			if (empty($langs)) {
 				throw new \Exception('There is no available languages for the ' . $appletLanguageId . ' applet.');
 			}
 			else {
 				echo ' - Available languages: ' . implode(', ', $langs) . "\n";
 			}
+
 			$path = $this->config->get('system.paths.root') . '/cache/flash';
-			foreach ($langs as $lang) {
-				$xmlContent = $this->getAppletLanguageFile($appletLanguageId, $lang);
-				$xmlFile    = $path . '/lang_' . $lang . '.xml';
-				if (strlen($xmlContent) == file_put_contents($xmlFile, $xmlContent)) {
-					echo " OK saving $xmlFile was successful.\n";
-				}
-				else {
-					throw new \Exception('Unable to save applet: (' . $appletLanguageId . ') language: (' . $lang
-						. ') xml (' . $xmlFile . ')!');
-				}
-			}
-			echo " < $appletLanguageId ($appletDirectory) language xml cached.\n";
+
+			$this->processAppletLanguages($appletLanguageId, $langs, $path);
 		}
 
 		echo "\nApplet language XMLs generated.\n";
+	}
+
+	private function processAppletLanguages($appletLanguageId, $langs, $path)
+	{
+		foreach ($langs as $lang) {
+			$xmlContent = $this->getAppletLanguageFile($appletLanguageId, $lang);
+			$xmlFile = $path . '/lang_' . $lang . '.xml';
+
+			if (strlen($xmlContent) == file_put_contents($xmlFile, $xmlContent)) {
+				echo " OK saving $xmlFile was successful.\n";
+			} else {
+				throw new \Exception("Unable to save applet: ($appletLanguageId) language: ($lang) xml ($xmlFile)!");
+			}
+		}
+
+		echo " < $appletLanguageId ($appletDirectory) language xml cached.\n";
 	}
 
 	/**
