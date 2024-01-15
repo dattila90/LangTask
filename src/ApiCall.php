@@ -21,7 +21,7 @@ class ApiCall
 			<cancel value="Törlés"/>
 		</data>';
 
-	public static function call($target, $mode, $getParameters, $postParameters)
+	public function call($target, $mode, $getParameters, $postParameters)
 	{
 		if (!isset($getParameters['action']))
 		{
@@ -31,20 +31,20 @@ class ApiCall
 		switch ($getParameters['action'])
 		{
 			case 'getLanguageFile':
-				return self::formatAsResult(self::GET_LANGUAGE_FILE_RESULT);
+				return $this->formatAsResult(self::GET_LANGUAGE_FILE_RESULT);
 				break;
 
 			case 'getAppletLanguages':
-				return self::formatAsResult(['en']);
+				return $this->formatAsResult(['en']);
 				break;
 
 			case 'getAppletLanguageFile':
-				return self::formatAsResult(self::GET_APPLET_LANGUAGE_FILE_RESULT);
+				return $this->formatAsResult(self::GET_APPLET_LANGUAGE_FILE_RESULT);
 				break;
 		}
 	}
 
-	private static function formatAsResult($data)
+	private function formatAsResult($data)
 	{
 		return [
 			'status' => 'OK',
